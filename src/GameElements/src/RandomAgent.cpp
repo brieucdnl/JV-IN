@@ -6,20 +6,10 @@ namespace GameElements
 {
 	RandomAgent::RandomAgent( const UnitsArchetypes::Archetype * archetype, const WeaponsArchetypes::Archetype * weaponArchetype, int numAgent, bool computeCollisionMesh/*=true*/ ) : AgentBase(archetype, weaponArchetype, numAgent, computeCollisionMesh)
 	{
-		m_velocity = randomVelocity() ;
+		
 	}
 
-	void RandomAgent::onCollision( const CollisionMessage & message )
-	{
-
-	}
-
-	Math::Vector2<Config::Real> RandomAgent::getVelocity() const
-	{
-		const Map::GroundCellDescription & currentCell = OgreFramework::GlobalConfiguration::getCurrentMap()->getCell(getPosition().projectZ()) ;
-		return m_velocity*(1.0-currentCell.m_speedReduction) ;
-	}
-
+	
 	void RandomAgent::update( const Config::Real & dt )
 	{
 		
@@ -27,9 +17,11 @@ namespace GameElements
 		{
 			this->agentSelection();
 		}
-		else this->agentUnSelection();
-			
-		
+		else
+		{
+			this->agentUnSelection();
+		}
+					
 		// Computes movements
 		const Map::GroundCellDescription & currentCell = OgreFramework::GlobalConfiguration::getCurrentMap()->getCell(getPosition().projectZ()) ;
 		Math::Vector2<Config::Real> newPosition = getPosition().projectZ()+m_velocity*dt*(1.0-currentCell.m_speedReduction) ;

@@ -12,6 +12,15 @@ namespace GameElements
 		Ogre::ManualObject *circle;
 		int m_numAgent;
 
+		Math::Vector2<Config::Real> m_velocity ;
+
+		Math::Vector2<Config::Real> randomVelocity()
+		{
+			Math::Vector2<Config::Real> velocity(rand()-RAND_MAX/2, rand()-RAND_MAX/2) ;
+			velocity = velocity.normalized() * m_archetype->m_speed ;
+			return velocity ;
+		}
+
 	public:
 		AgentBase(const UnitsArchetypes::Archetype * archetype, const WeaponsArchetypes::Archetype * weaponArchetype, int numAgent, bool computeCollisionMesh=true);
 
@@ -33,7 +42,7 @@ namespace GameElements
 		/// \author	Fabrice Lamarche, university of Rennes 1
 		/// \param	message	The message.
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual void onCollision (const CollisionMessage & message) = 0;
+		void onCollision (const CollisionMessage & message);
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	virtual Math::Vector2<Config::Real> RandomAgent::getVelocity() const
@@ -43,7 +52,7 @@ namespace GameElements
 		/// \author	Fabrice Lamarche, university of Rennes 1
 		/// \return	The velocity.
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual Math::Vector2<Config::Real> getVelocity() const = 0 ;
+		Math::Vector2<Config::Real> getVelocity() const ;
 
 
 		void agentSelection () const;
