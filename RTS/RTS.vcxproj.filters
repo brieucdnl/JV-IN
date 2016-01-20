@@ -295,11 +295,10 @@
     <ClInclude Include="..\src\GameElements\AgentBase.h">
       <Filter>GameElements</Filter>
     </ClInclude>
-<<<<<<< HEAD
-    <ClInclude Include="..\src\GameElements\AgentJoueur.h">
-=======
     <ClInclude Include="..\src\GameElements\IAgent.h">
->>>>>>> 71c9171384a09c5803faeaa9b9b0eaaef1f660b5
+      <Filter>GameElements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\GameElements\AgentJoueur.h">
       <Filter>GameElements</Filter>
     </ClInclude>
   </ItemGroup>
@@ -445,11 +444,10 @@
     <ClCompile Include="..\src\GameElements\src\AgentBase.cpp">
       <Filter>GameElements\src</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="..\src\GameElements\src\AgentJoueur.cpp">
-=======
     <ClCompile Include="..\src\GameElements\src\IAgent.cpp">
->>>>>>> 71c9171384a09c5803faeaa9b9b0eaaef1f660b5
+      <Filter>GameElements\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\GameElements\src\AgentJoueur.cpp">
       <Filter>GameElements\src</Filter>
     </ClCompile>
   </ItemGroup>
