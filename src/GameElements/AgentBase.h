@@ -47,6 +47,8 @@ namespace GameElements
 
 
 		void agentSelection () const;
+
+		void agentUnSelection () const;
 	};
 }
 

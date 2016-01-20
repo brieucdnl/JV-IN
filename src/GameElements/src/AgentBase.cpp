@@ -31,11 +31,14 @@ namespace GameElements
 	void AgentBase::agentSelection() const
 	{
 		circle->setVisible(true);
-		std::cout<<"selected item : "<<this->getArchetype()->m_name+"num"+(char)m_numAgent
-			
-			
-			
-			<<std::endl;
+		//std::cout << "selected item : " << this->getArchetype()->m_name+"num"+(char)m_numAgent << std::endl;
 	}
+	
+	void AgentBase::agentUnSelection() const
+	{
+		circle->setVisible(false);
+		//std::cout << "Unselected item : " << this->getArchetype()->m_name+"num"+(char)m_numAgent << std::endl;
+	}
+
 
 }

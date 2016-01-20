@@ -27,6 +27,7 @@ namespace GameElements
 		{
 			this->agentSelection();
 		}
+		else this->agentUnSelection();
 			
 		
 		// Computes movements
