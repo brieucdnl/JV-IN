@@ -5,6 +5,7 @@
 /*
 	TODO :
 		* Call friends
+		* Choix des unites
 */
 
 namespace GameElements
@@ -130,10 +131,10 @@ namespace GameElements
 		m_perception->reset() ;
 	}
 
-	void IAgent::addListener(System::IAgentEmitter<short> * emitter)
-	{
+	//void IAgent::addListener(System::IAgentEmitter<short> * emitter)
+	//{
 		//listener(emitter);
-	}
+	//}
 
 	// Choisir un ennemi en fonction de son nom
 	int IAgent::choose_by_name(std::vector<Agent::Pointer> &liste_ennemis, int i1, int i2)

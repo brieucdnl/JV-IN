@@ -18,6 +18,7 @@
 #include <Ext/Ogre/ComputeBoundingBox.h>
 #include <Triggers/BasicCollisionDetector.h>
 #include <GameElements/RandomAgent.h>
+#include <GameElements/IAgent.h>
 
 namespace OgreFramework
 {

@@ -2,8 +2,8 @@
 
 #include <GameElements/AgentBase.h>
 #include <OgreFramework/GlobalConfiguration.h>
-#include <System/IAgentEmitter.h>
-#include <System/IAgentListener.h>
+//#include <System/IAgentEmitter.h>
+//#include <System/IAgentListener.h>
 
 namespace GameElements
 {
@@ -106,6 +106,6 @@ namespace GameElements
 		///
 		/// \author	Paul LD & Fabrice Lamarche, university of Rennes 1
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual void addListener(System::IAgentEmitter<short> * emitter);
+		//virtual void addListener(System::IAgentEmitter<short> * emitter);
 	};
 }
