@@ -1,4 +1,5 @@
 *.suo
+RTS/Ogre.log
 .svn/
 data/
 Debug/
