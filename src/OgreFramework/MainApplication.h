@@ -31,6 +31,7 @@ namespace OgreFramework
 	protected:
 		void choixUnites(const int budget);
 		void creerArmee(::std::vector<::std::string> types, std::vector<int> armee);
+		void MainApplication::creerChemin(std::string map);
 
 		///////////////////////////////////////////////////////////////////////////////////
 		/// \brief Returns the scene manager

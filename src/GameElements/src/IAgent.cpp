@@ -5,7 +5,9 @@
 /*
 	TODO :
 		* Call friends
+		* Gérer la VITESSE
 		* MainApplication::creerArmee : IAgent -> PlayerAgent
+		* Rendre les IA moins pussy
 */
 
 namespace GameElements

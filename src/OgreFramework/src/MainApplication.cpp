@@ -22,6 +22,11 @@
 
 namespace OgreFramework
 {
+	//FLAG pour savoir si on est avant le debut de la partie./
+	bool FLAG = true;
+	std::vector<Ogre::Vector3> cibles;
+	short current_cible = 0;
+
 	MainApplication::MainApplication()
 		: m_keyboardState(*KeyboardState::getInstance())
 	{
@@ -41,6 +46,7 @@ namespace OgreFramework
 		//new Triggers::BasicCollisionDetector ;
 		
 		GlobalConfiguration::setCurrentMap("map01") ;
+		creerChemin("map01");
 
 		// create your scene here :)
 		::std::cout<<"Creating scene..."<<::std::flush ;
@@ -252,6 +258,32 @@ namespace OgreFramework
 		}
 	}
 
+	void MainApplication::creerChemin(std::string map)
+	{
+		const char * c = &map[map.size() - 1];
+
+		switch(atoi(c))
+		{
+		case 1:
+			cibles.push_back(Ogre::Vector3(0,0,70));
+			cibles.push_back(Ogre::Vector3(-30,30,75));
+			cibles.push_back(Ogre::Vector3(-15,-20,75));
+			cibles.push_back(Ogre::Vector3(-15,-20,30));
+			cibles.push_back(Ogre::Vector3(-5,-5,30));
+			cibles.push_back(Ogre::Vector3(5,5,50));
+			cibles.push_back(Ogre::Vector3(10,-10,75));
+			cibles.push_back(Ogre::Vector3(10,-10,30));
+			cibles.push_back(Ogre::Vector3(30,-25,30));
+			cibles.push_back(Ogre::Vector3(30,-30,75));
+			cibles.push_back(Ogre::Vector3(0,0,70));
+			break;
+		default:
+			FLAG = false;
+			std::cout << "map inexistante" << std::endl;
+			break;
+		}
+	}
+
 	void MainApplication::update(Ogre::Real dt)
 	{
 		// Necessary for GUI...
@@ -289,6 +321,24 @@ namespace OgreFramework
 
 		// Updates camera manager
 		m_cameraManager->update(dt) ;
+
+		if(FLAG){
+			
+			Ogre::Real dist = cibles[current_cible].squaredDistance(m_camera->getPosition()) ; 
+			
+			if( dist < 250 ) current_cible++; // TO DO !! 
+
+			if(current_cible >= cibles.size()) FLAG = false ;
+			else{
+				Ogre::Vector3 v = cibles[current_cible] - m_camera->getPosition();
+				if(m_camera->getPosition()[2] < 50) m_camera->move((v/v.normalise())* 400*dt);
+				else m_camera->move((v/v.normalise())* 800*dt);
+			}
+		}
+		else m_camera->setPosition(Ogre::Vector3(0,0,70));
+
+
+
 		// Updates (animation, behavoir & son on) are called here :)
 		GlobalConfiguration::getController()->update(dt) ;
 
@@ -310,6 +360,7 @@ namespace OgreFramework
 
 	bool MainApplication::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 	{
+		FLAG = false;
 		bool result = BaseApplication::mousePressed(arg, id) ;
 		m_picking->update(arg, id) ;
 		return result ;
@@ -322,6 +373,7 @@ namespace OgreFramework
 
 	bool MainApplication::keyPressed( const OIS::KeyEvent &arg )
 	{
+		FLAG = false;
 		// Keeps the keyboard state up to date
 		m_keyboardState.notifyKeyPressed(arg.key) ;
 		// Sends notification to super class
