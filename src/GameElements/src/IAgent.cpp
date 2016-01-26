@@ -5,13 +5,13 @@
 /*
 	TODO :
 		* Call friends
-		* Choix des unites
+		* MainApplication::creerArmee : IAgent -> PlayerAgent
 */
 
 namespace GameElements
 {
 	// Get name
-	std::string IAgent::getNameAgent(Agent::Pointer a){ return a->getArchetype()->m_name;}
+	inline std::string IAgent::getNameAgent(Agent::Pointer a){ return a->getArchetype()->m_name;}
 
 	//normal
 	bool myfn(const Triggers::CollisionObject::Pointer i, const Triggers::CollisionObject::Pointer j) { 
@@ -44,7 +44,7 @@ namespace GameElements
 	void IAgent::update( const Config::Real & dt )
 	{
 		//nom et equipe de l'AgentBase (equipe = R ou B)
-		std::string my_name = this->getArchetype()->m_name;
+		std::string my_name = getNameAgent(this);
 		char my_team = my_name[my_name.size() -1];
 
 		// Computes movements
@@ -87,7 +87,7 @@ namespace GameElements
 				{
 					//on cherche si on est allie
 					Agent::Pointer ptr0 = boost::dynamic_pointer_cast<Agent>(objects[cpt]) ;
-					char agent_team = ptr0->getArchetype()->m_name[ptr0->getArchetype()->m_name.size()-1];
+					char agent_team = getNameAgent(ptr0)[getNameAgent(ptr0).size()-1];
 					bool allie =  (agent_team == my_team) ;
 					if(!allie)
 					{
@@ -118,23 +118,18 @@ namespace GameElements
 					// If displacement is valid, the AgentBase moves, otherwise, a new random velocity is computed
 					if(OgreFramework::GlobalConfiguration::getCurrentMap()->isValid(newPosition) && OgreFramework::GlobalConfiguration::getCurrentMap()->getCell(newPosition).m_speedReduction!=1.0)
 					{
-						setOrientation(m_velocity) ;
+						setOrientation(m_velocity/4) ;
 						setPosition(newPosition.push(0.0)) ;
 					}
 					else
 					{
-						m_velocity = randomVelocity() ;
+						m_velocity = randomVelocity()/4 ;
 					}
 				}
 			}
 		}
 		m_perception->reset() ;
 	}
-
-	//void IAgent::addListener(System::IAgentEmitter<short> * emitter)
-	//{
-		//listener(emitter);
-	//}
 
 	// Choisir un ennemi en fonction de son nom
 	int IAgent::choose_by_name(std::vector<Agent::Pointer> &liste_ennemis, int i1, int i2)
@@ -266,7 +261,7 @@ namespace GameElements
 	  {
 		for(unsigned int cpt=0;cpt<liste_amis.size();cpt++)
 		{
-		  if(time_to_join(liste_amis[cpt]) < temps_de_survie(liste_ennemis)) {return false;}
+			if(time_to_join(liste_amis[cpt]) < temps_de_survie(liste_ennemis)) {callFriends(liste_amis[cpt]); false;}
 		}
 	  }
 	  return true ;
@@ -281,11 +276,12 @@ namespace GameElements
 	  return mylife - tk*degat ;
 	}
 
-	// appeler les amis a la rescousse
-	void IAgent::callFriends(std::vector<Agent::Pointer> &liste_amis) {
-		for(unsigned int cpt = 0; cpt < liste_amis.size(); cpt++){
-			std::cout<<"appeler la fonction des tocards"<<std::endl;
-		}
+	// TODO
+	// appeler l'ami a la rescousse
+	void IAgent::callFriends(Agent::Pointer ami) {
+		//ami.setPosition(maPosition);
+		//ou
+		//ami.followTarget(myPosition);
 	}
 
 	// Voir la liste des amis alentour
@@ -302,7 +298,7 @@ namespace GameElements
 			{
 				//on cherche si on est allie
 				Agent::Pointer ptr = boost::dynamic_pointer_cast<Agent>(objects[cpt]) ;
-				char agent_team = ptr->getArchetype()->m_name[ptr->getArchetype()->m_name.size()-1];
+				char agent_team = getNameAgent(ptr)[getNameAgent(ptr).size()-1];
 				bool allie =  (agent_team == my_team) ;
 			
 				if(allie)
@@ -357,19 +353,17 @@ namespace GameElements
 	// Si renvoit -1 : fuite
 	int IAgent::choix(std::vector<Agent::Pointer> &liste_ennemis)
 	{
-		int ind_ennemi = -1 ;
+		  int ind_ennemi = -1 ;
 		  if(liste_ennemis.size() !=0)
 		  {
 			  std::vector<Agent::Pointer> to_kill = who_kill(liste_ennemis);
 			  
 			  if(to_kill.size() == 0) // On ne peut tuer personne
 			  {
-
 				std::vector<Agent::Pointer> liste_amis = getFriends();
 
 				if(!alone_in_the_dark(liste_amis,liste_ennemis)) //Support possible
 				{
-				  callFriends(liste_amis);
 				  for(unsigned int cpt=0;cpt<liste_ennemis.size();cpt++)
 				  {
 					if(cpt==0) ind_ennemi = 0;

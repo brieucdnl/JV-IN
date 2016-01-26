@@ -97,15 +97,99 @@ namespace OgreFramework
 			tmp.push_back("item 3") ;
 			OgreBites::SelectMenu * menu1 = m_trayManager->createThickSelectMenu(OgreBites::TL_TOPLEFT, "Menu 2", "Foo 2", 200, 10, tmp) ;
 		}
+
 		// Setups the picking
 		//m_picking = new PickingBoundingBox(m_sceneManager, m_camera, OIS::MB_Left) ;
 		m_picking = new PickingSelectionBuffer(m_window, m_sceneManager, m_camera, OIS::MB_Left) ;
+
 		// Setups the camera control system
 		m_cameraManager = new RTSCameraManager(m_sceneManager, m_camera, &m_keyboardState) ;
 
 		// ----------------------------------------
 		// Creates two entities for testing purpose
 		// ----------------------------------------
+		int budget = 2000;
+		choixUnites(budget);
+	}
+
+	void MainApplication::choixUnites(const int budget){
+		assert( budget > 0 );
+
+		int budget_r = budget;
+		int budget_r_ia = budget;
+		int hippo_c = 1000, croco_c = 500, moustic_c = 250;
+		int choix;
+
+		//0 = moustic ; 1 = croco; 2 = hippo;
+		//3 = mousticIA ; 4 = crocoIA; 5 = hippoIA;
+		std::vector<int> armee(6,0);
+		
+		/*
+		 * Choix de l'IA
+		 * 2C -> 1H -> 1M
+		 */
+		while(budget_r_ia >= moustic_c){
+		
+			if(budget_r_ia >= croco_c){	
+				budget_r_ia -= croco_c;
+				armee[4]++;
+			}
+
+			if(budget_r_ia >= croco_c){	
+				budget_r_ia -= croco_c;
+				armee[4]++;
+			}
+
+			if(budget_r_ia >= hippo_c){	
+				budget_r_ia -= hippo_c;
+				armee[5]++;
+			}				
+			if(budget_r_ia >= moustic_c){	
+				budget_r_ia -= moustic_c;
+				armee[3]++;
+			}	
+		}
+
+		std::cout << "////////////////////////////////////////////////////////////////////////////////";
+		std::cout << "////////////////////////////// Selection des unites de l'armee /////////////////";
+		std::cout << "////////////////////////////////////////////////////////////////////////////////";	
+		while(budget_r >= moustic_c){
+			std::cout << "Montant restant de la caisse noire : $" << budget_r << "/$" << budget << std::endl;
+			if(budget_r >= hippo_c){
+				std::cout << "Veuillez choisir entre :\n (1) _Moustic ($250).\n (2) _Croco ($500).\n (3) _Hippo ($1000)." << std::endl;
+				std::cin >> choix;
+			}
+			else if(budget_r >= croco_c){
+				std::cout << "Veuillez choisir entre :\n (1) _Moustic ($250).\n (2) _Croco ($500)." << std::endl;
+				std::cin >> choix;
+			}
+			else{
+				std::cout << "Veuillez choisir entre :\n (1) _Moustic ($250)." << std::endl;
+				std::cin >> choix;
+			}
+			switch(choix){
+				case 1:
+					budget_r -= moustic_c;
+					armee[0]++;
+					break;
+				case 2:
+					budget_r -= croco_c;
+					armee[1]++;
+					break;
+				case 3:
+					budget_r -= hippo_c;
+					armee[2]++;
+					break;
+				default:
+					std::cout << "Mauvais choix :(" << std::endl;
+					break;
+			}
+		}
+		
+		std::cout << "////////////////////////////////////////////////////////////////////////////////";
+		std::cout << "////////////////////////////////////////////////////////////////////////////////";
+		std::cout << "Votre armee contient : " << armee[2] << " Hippo(s), " << armee[1] << " Croco(s) et " << armee[0] << " Moustic(s) " << std::endl;
+		std::cout << "L' armee IA contient : " << armee[5] << " Hippo(s), " << armee[4] << " Croco(s) et " << armee[3] << " Moustic(s) " << std::endl;
 		::std::vector<::std::string> types ;
 		types.push_back("MousticB") ;
 		types.push_back("CrocoB") ;
@@ -113,30 +197,59 @@ namespace OgreFramework
 		types.push_back("MousticR") ;
 		types.push_back("CrocoR") ;
 		types.push_back("HippoR") ;
-		for(int cpt=0 ; cpt<50 ; ++cpt)
-		{
-			const GameElements::UnitsArchetypes::Archetype * unit = GlobalConfiguration::getConfigurationLoader()->getUnitsArchetypes().get(types[rand()%types.size()]) ;
+		std::cout << "////////////////////////////////////////////////////////////////////////////////";
+		std::cout << "////////////////////////////////////////////////////////////////////////////////" << std::endl;
+		creerArmee(types, armee);
+	}
+
+	void MainApplication::creerArmee(::std::vector<::std::string> types, std::vector<int> armee){
+		
+		int nbMoustic = armee[0], nbCroco = armee[1], nbHippo = armee[2];
+		int nbMousticIA = armee[3], nbCrocoIA = armee[4], nbHippoIA = armee[5];
+
+		/*
+		 * JOUEUR
+		 */
+		for(int cpt=0 ; cpt<nbMoustic ; cpt++){
+			const GameElements::UnitsArchetypes::Archetype * unit = GlobalConfiguration::getConfigurationLoader()->getUnitsArchetypes().get(types[0]) ;
 			const GameElements::WeaponsArchetypes::Archetype * weapon = GlobalConfiguration::getConfigurationLoader()->getWeaponsArchetypes().get(unit->m_weapon) ;
-			if(weapon==NULL) { ::std::cout<<"HippoB: bad weapon!" ; char c ; ::std::cin>>c ; }
-			GameElements::RandomAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ;
+			GameElements::IAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ;//a changer
 			m_entityAdapter->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(GlobalConfiguration::getCurrentMap()->findFreeLocation()).push(0.0)) ;
 		}
-		//m_entityAdapter = new GameElements::NullAgent(configurationLoader.getUnitsArchetypes().get("HippoB"), configurationLoader.getWeaponsArchetypes().get()) ;
+		for(int cpt=0 ; cpt<nbCroco ; cpt++){
+			const GameElements::UnitsArchetypes::Archetype * unit = GlobalConfiguration::getConfigurationLoader()->getUnitsArchetypes().get(types[1]) ;
+			const GameElements::WeaponsArchetypes::Archetype * weapon = GlobalConfiguration::getConfigurationLoader()->getWeaponsArchetypes().get(unit->m_weapon) ;
+			GameElements::IAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ;//a changer
+			m_entityAdapter->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(GlobalConfiguration::getCurrentMap()->findFreeLocation()).push(0.0)) ;
+		}
+		for(int cpt=0 ; cpt<nbHippo ; cpt++){
+			const GameElements::UnitsArchetypes::Archetype * unit = GlobalConfiguration::getConfigurationLoader()->getUnitsArchetypes().get(types[2]) ;
+			const GameElements::WeaponsArchetypes::Archetype * weapon = GlobalConfiguration::getConfigurationLoader()->getWeaponsArchetypes().get(unit->m_weapon) ;
+			GameElements::IAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ; //a changer
+			m_entityAdapter->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(GlobalConfiguration::getCurrentMap()->findFreeLocation()).push(0.0)) ;
+		}
 
-		// Test pour vérifier la correspondance carte <-> représentation graphique
-		//for(int x=0 ; x<GlobalConfiguration::getCurrentMap()->width() ; x+=10)
-		//	for(int y=0 ; y<GlobalConfiguration::getCurrentMap()->height() ; y+=10)
-		//	{
-		//		if(GlobalConfiguration::getCurrentMap()->getCell(Math::Vector2<int>(x,y)).m_speedReduction!=1.0)
-		//		{
-		//			unit = GlobalConfiguration::getConfigurationLoader()->getUnitsArchetypes().get("CrocoB") ;
-		//			weapon = GlobalConfiguration::getConfigurationLoader()->getWeaponsArchetypes().get(unit->m_weapon) ;
-		//			if(weapon==NULL) { ::std::cout<<"CrocoB: bad weapon!" ; char c ; ::std::cin>>c ; }
-		//			GameElements::NullAgent::Pointer ptr = new GameElements::NullAgent(unit, weapon) ; // HippoB, CrocoB, MousticB
-		//			ptr->setOrientation(0.0,0.0,Math::piDiv4) ;
-		//			ptr->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(Math::Vector2<int>(x,y)).push(0.0)) ;
-		//		}
-		//	}
+		/*
+		 * IA
+		 */
+		for(int cpt=0 ; cpt<nbMousticIA ; cpt++){
+			const GameElements::UnitsArchetypes::Archetype * unit = GlobalConfiguration::getConfigurationLoader()->getUnitsArchetypes().get(types[3]) ;
+			const GameElements::WeaponsArchetypes::Archetype * weapon = GlobalConfiguration::getConfigurationLoader()->getWeaponsArchetypes().get(unit->m_weapon) ;
+			GameElements::IAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ;
+			m_entityAdapter->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(GlobalConfiguration::getCurrentMap()->findFreeLocation()).push(0.0)) ;
+		}
+		for(int cpt=0 ; cpt<nbCrocoIA ; cpt++){
+			const GameElements::UnitsArchetypes::Archetype * unit = GlobalConfiguration::getConfigurationLoader()->getUnitsArchetypes().get(types[4]) ;
+			const GameElements::WeaponsArchetypes::Archetype * weapon = GlobalConfiguration::getConfigurationLoader()->getWeaponsArchetypes().get(unit->m_weapon) ;
+			GameElements::IAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ;
+			m_entityAdapter->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(GlobalConfiguration::getCurrentMap()->findFreeLocation()).push(0.0)) ;
+		}
+		for(int cpt=0 ; cpt<nbHippoIA ; cpt++){
+			const GameElements::UnitsArchetypes::Archetype * unit = GlobalConfiguration::getConfigurationLoader()->getUnitsArchetypes().get(types[5]) ;
+			const GameElements::WeaponsArchetypes::Archetype * weapon = GlobalConfiguration::getConfigurationLoader()->getWeaponsArchetypes().get(unit->m_weapon) ;
+			GameElements::IAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ;
+			m_entityAdapter->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(GlobalConfiguration::getCurrentMap()->findFreeLocation()).push(0.0)) ;
+		}
 	}
 
 	void MainApplication::update(Ogre::Real dt)

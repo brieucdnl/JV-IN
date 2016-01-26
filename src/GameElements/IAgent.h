@@ -23,47 +23,47 @@ namespace GameElements
 		//System::IAgentListener<short> listener;
 
 		// Get attributes
-		std::string getNameAgent(Agent::Pointer a);
-		float getFrequency(Agent::Pointer a);
-		int getStrenght(Agent::Pointer a);
+		inline std::string getNameAgent(Agent::Pointer a);
+		inline float getFrequency(Agent::Pointer a);
+		inline int getStrenght(Agent::Pointer a);
 
 		// Choisir un ennemi en fonction de son nom
-		int choose_by_name(std::vector<Agent::Pointer> &liste_ennemis, int i1, int i2);
+		inline int choose_by_name(std::vector<Agent::Pointer> &liste_ennemis, int i1, int i2);
 
 		// Dégats infligés par unités de temps
-		int degat_par_t(Agent::Pointer a);
+		inline int degat_par_t(Agent::Pointer a);
 
 		// Degats recus par unités de temps pour plusieurs ennemis
-		int degat_par_t_list(std::vector<Agent::Pointer> &liste_ennemis);
+		inline int degat_par_t_list(std::vector<Agent::Pointer> &liste_ennemis);
 
 		// Temps de survie de l'unité en fonction des ennemis percus dans la zone
-		float temps_de_survie(std::vector<Agent::Pointer> &liste_ennemis, int mylife = 0 );
+		inline float temps_de_survie(std::vector<Agent::Pointer> &liste_ennemis, int mylife = 0 );
 
 		//Temps nécessaire pour tuer l'ennemi
-		float temps_pour_kill(Agent::Pointer ennemi);
+		inline float temps_pour_kill(Agent::Pointer ennemi);
 
 		// Renvoyer la liste des AgentBases que l'on peut tuer alentour
-		std::vector<Agent::Pointer> who_kill(std::vector<Agent::Pointer> &liste_ennemis);
+		inline std::vector<Agent::Pointer> who_kill(std::vector<Agent::Pointer> &liste_ennemis);
 
 		//Temps pour aller d'un point A a un point B
-		double time_to_join(Agent::Pointer a);
+		inline double time_to_join(Agent::Pointer a);
 
 		//Tester si une situation est désespérée
-		bool alone_in_the_dark(std::vector<Agent::Pointer> &liste_amis, std::vector<Agent::Pointer> &liste_ennemis);
+		inline bool alone_in_the_dark(std::vector<Agent::Pointer> &liste_amis, std::vector<Agent::Pointer> &liste_ennemis);
 
-		int choose_by_survival(std::vector<Agent::Pointer> &liste_ennemis);
+		inline int choose_by_survival(std::vector<Agent::Pointer> &liste_ennemis);
 
 		// Calcul de la vie qu'il nous reste si on tue l'ennemi i dans la liste
-		int vie_apres_kill(std::vector<Agent::Pointer> &liste_ennemis, int i);
+		inline int vie_apres_kill(std::vector<Agent::Pointer> &liste_ennemis, int i);
 
-		void callFriends(std::vector<Agent::Pointer> &liste_amis);
+		inline void callFriends(Agent::Pointer ami);
 		
-		std::vector<Agent::Pointer> getFriends();
+		inline std::vector<Agent::Pointer> getFriends();
 		
 		//Choisir qui tuer
 		// Renvoit l'indice de l'ennemi à attaquer dans la liste
 		// Si renvoit -1, FUITE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		int choix(std::vector<Agent::Pointer> &liste_ennemis);
+		inline int choix(std::vector<Agent::Pointer> &liste_ennemis);
 
 
 	public:
@@ -77,7 +77,7 @@ namespace GameElements
 		/// \author	Fabrice Lamarche, university of Rennes 1
 		/// \param	dt	The dt.
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual void update(const Config::Real & dt);
+		inline virtual void update(const Config::Real & dt);
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	virtual void NullAgentBase::onCollision (const CollisionMessage & message);

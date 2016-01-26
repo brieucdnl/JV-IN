@@ -29,6 +29,9 @@ namespace OgreFramework
 		virtual ~MainApplication();
 
 	protected:
+		void choixUnites(const int budget);
+		void creerArmee(::std::vector<::std::string> types, std::vector<int> armee);
+
 		///////////////////////////////////////////////////////////////////////////////////
 		/// \brief Returns the scene manager
 		/// 
