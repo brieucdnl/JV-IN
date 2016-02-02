@@ -67,6 +67,12 @@ namespace GameElements
 		addShape(Triggers::Shape(Triggers::Shape::Vector2(0.0,0.0), 0.1)) ;
 		//Triggers::CollisionObject::setActive(false);
 		setPosition(Math::Vector3<Config::Real>(origin[0], origin[1], 0.0)) ;
+
+	}
+
+	Bullet::~Bullet()
+	{
+
 	}
 
 	void Bullet::hit( CollisionObject::Pointer object )

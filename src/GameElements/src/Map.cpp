@@ -50,12 +50,16 @@ GameElements::Map::Map( Ogre::SceneManager * sceneManager, TinyXML::TiXmlElement
 	// Extracts cell descriptions		
 	parseCellsTypes(mapDescription);
 	// Loads the map geometry
+	std::cout << "scene manager" <<std::endl;
 	OgreFramework::GeometryLoader loader(sceneManager) ;
+	std::cout << "scene load" <<std::endl;
 	m_node = loader.load(mesh,scale) ;
 	// Loads the image of the map
+	std::cout << "load map" <<std::endl;
 	loadMap(mapData);
 	// Hides the map geometry after loading
 	show(false) ;
+	std::cout << "map cree" <<std::endl;
 }
 
 void GameElements::Map::loadMap( ::std::string mapData )

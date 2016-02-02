@@ -19,11 +19,29 @@
 #include <Triggers/BasicCollisionDetector.h>
 #include <GameElements/RandomAgent.h>
 #include <GameElements/IAgent.h>
+#include <sstream>
+
+#define SSTR( x ) static_cast< std::ostringstream & >( \
+    ( std::ostringstream() << std::dec << x ) ).str()
 
 namespace OgreFramework
 {
-	//FLAG pour savoir si on est avant le debut de la partie./
-	bool FLAG = true;
+	int hippo_c = 1000, croco_c = 500, moustic_c = 250;
+
+	OgreBites::Label * b_r ;
+	OgreBites::Label * arme;
+	std::vector<int> armee(6,0);
+	//FLAGS pour savoir ou on est avant le debut de la partie./
+	bool CINE = true;
+	bool DEF_VIEW = false;
+	bool START = false;
+
+	// Data parties
+	int budget = 0;
+	int budget_restant = 0;
+	int mode=0;
+
+	//data carte
 	std::vector<Ogre::Vector3> cibles;
 	short current_cible = 0;
 
@@ -44,7 +62,7 @@ namespace OgreFramework
 		// Creates the instance of collision detector
 		new Triggers::SweepAndPrune ;
 		//new Triggers::BasicCollisionDetector ;
-		
+
 		GlobalConfiguration::setCurrentMap("map01") ;
 		creerChemin("map01");
 
@@ -85,117 +103,219 @@ namespace OgreFramework
 		// Gets the root scene node
 		Ogre::SceneNode * rootSceneNode = getRootSceneNode() ;
 		
-		// --------------------------------------
-		// Setups the GUI (it's a test / example)
-		// --------------------------------------
-		
-		{
-			Ogre::StringVector tmp ;
-			tmp.push_back("item 1") ;
-			tmp.push_back("item 2") ;
-			tmp.push_back("item 3") ;
-			OgreBites::SelectMenu * menu1 = m_trayManager->createThickSelectMenu(OgreBites::TL_TOPLEFT, "Menu 1", "Foo", 200, 10, tmp) ;
-		}
-		{
-			Ogre::StringVector tmp ;
-			tmp.push_back("item 1") ;
-			tmp.push_back("item 2") ;
-			tmp.push_back("item 3") ;
-			OgreBites::SelectMenu * menu1 = m_trayManager->createThickSelectMenu(OgreBites::TL_TOPLEFT, "Menu 2", "Foo 2", 200, 10, tmp) ;
-		}
-
 		// Setups the picking
 		//m_picking = new PickingBoundingBox(m_sceneManager, m_camera, OIS::MB_Left) ;
 		m_picking = new PickingSelectionBuffer(m_window, m_sceneManager, m_camera, OIS::MB_Left) ;
 
 		// Setups the camera control system
 		m_cameraManager = new RTSCameraManager(m_sceneManager, m_camera, &m_keyboardState) ;
-
-		// ----------------------------------------
-		// Creates two entities for testing purpose
-		// ----------------------------------------
-		int budget = 2000;
-		choixUnites(budget);
 	}
 
-	void MainApplication::choixUnites(const int budget){
-		assert( budget > 0 );
-
-		int budget_r = budget;
-		int budget_r_ia = budget;
-		int hippo_c = 1000, croco_c = 500, moustic_c = 250;
-		int choix;
-
-		//0 = moustic ; 1 = croco; 2 = hippo;
-		//3 = mousticIA ; 4 = crocoIA; 5 = hippoIA;
-		std::vector<int> armee(6,0);
-		
-		/*
-		 * Choix de l'IA
-		 * 2C -> 1H -> 1M
-		 */
-		while(budget_r_ia >= moustic_c){
-		
-			if(budget_r_ia >= croco_c){	
-				budget_r_ia -= croco_c;
-				armee[4]++;
-			}
-
-			if(budget_r_ia >= croco_c){	
-				budget_r_ia -= croco_c;
-				armee[4]++;
-			}
-
-			if(budget_r_ia >= hippo_c){	
-				budget_r_ia -= hippo_c;
-				armee[5]++;
-			}				
-			if(budget_r_ia >= moustic_c){	
-				budget_r_ia -= moustic_c;
-				armee[3]++;
-			}	
+	void MainApplication::createW()
+	{
+		{
+			std::string caption = "Budget restant = 0 ";
+			b_r =  m_trayManager->createLabel(OgreBites::TL_CENTER,"Budget_restant",caption,250);
+			arme =  m_trayManager->createLabel(OgreBites::TL_CENTER,"Arme","Votre armee est vide",500);
+			b_r->hide();
+			arme->hide();
+			OgreBites::Button * valid_armee =  m_trayManager->createButton(OgreBites::TL_CENTER, "Val_armee", "Valider",100) ;
+			OgreBites::Button * annul_armee =  m_trayManager->createButton(OgreBites::TL_CENTER, "Annul_armee", "Annuler",100) ;
+			valid_armee->hide();
+			annul_armee->hide();
+		}
+		{
+			Ogre::StringVector tmp ;
+			tmp.push_back("1 VERSUS 1") ;
+			tmp.push_back("MASSIVE") ;
+			OgreBites::SelectMenu * menu1 = m_trayManager->createThickSelectMenu(OgreBites::TL_CENTER, "Mode", "Choisissez le MODE de jeu", 200, 10, tmp) ;		
+			menu1->hide();
 		}
 
+		{
+			Ogre::StringVector tmp ;
+			tmp.push_back("Map 01") ;
+			tmp.push_back("Map 02") ;
+			OgreBites::SelectMenu * menu2 = m_trayManager->createThickSelectMenu(OgreBites::TL_CENTER, "Map", "Choisissez la Map", 200, 10, tmp) ;	
+			menu2->hide();
+		}
+
+		{
+			Ogre::StringVector tmp ;
+			tmp.push_back("250") ;
+			tmp.push_back("500") ;
+			tmp.push_back("750") ;
+			tmp.push_back("1000") ;
+			tmp.push_back("1250") ;
+			tmp.push_back("1500") ;
+			tmp.push_back("1750") ;
+			tmp.push_back("2000") ;
+			tmp.push_back("2250") ;
+			tmp.push_back("2500") ;
+			tmp.push_back("2750") ;
+			tmp.push_back("3000") ;
+
+			OgreBites::SelectMenu * menu3 = m_trayManager->createThickSelectMenu(OgreBites::TL_CENTER, "Budget", "Choisissez le budget", 200, 10, tmp) ;		
+			menu3->hide();
+		}
+
+		{
+			OgreBites::Button * val = m_trayManager->createButton(OgreBites::TL_CENTER, "Val", "READY",100) ;	
+			val->hide();
+		}
+
+		{
+			OgreBites::Button * b_H = m_trayManager->createButton(OgreBites::TL_CENTER, "Hippo", "Hippo",100) ;	
+			OgreBites::Button * b_C = m_trayManager->createButton(OgreBites::TL_CENTER, "Croco", "Croco",100) ;	
+			OgreBites::Button * b_M = m_trayManager->createButton(OgreBites::TL_CENTER, "Moustic", "Moustic",100) ;	
+			b_H->hide();
+			b_C->hide();
+			b_M->hide();
+		}
+	}
+	
+	void MainApplication::choixMode(std::string m,OgreBites::SelectMenu * menu){
+
 		std::cout << "////////////////////////////////////////////////////////////////////////////////";
-		std::cout << "////////////////////////////// Selection des unites de l'armee /////////////////";
-		std::cout << "////////////////////////////////////////////////////////////////////////////////";	
-		while(budget_r >= moustic_c){
-			std::cout << "Montant restant de la caisse noire : $" << budget_r << "/$" << budget << std::endl;
-			if(budget_r >= hippo_c){
-				std::cout << "Veuillez choisir entre :\n (1) _Moustic ($250).\n (2) _Croco ($500).\n (3) _Hippo ($1000)." << std::endl;
-				std::cin >> choix;
+		std::cout << "Vous avez choisi le mode " << m << std::endl;
+		std::cout << "////////////////////////////////////////////////////////////////////////////////";
+		
+		if(m=="MASSIVE"){
+			mode = 2;
+			m_trayManager->getWidget("Budget")->show();
+		}
+		else{
+			mode =1;
+			m_trayManager->getWidget("Budget")->hide();
+		}
+
+	}
+
+	void MainApplication::choixMap(std::string m,OgreBites::SelectMenu * menu){
+
+		std::cout << "////////////////////////////////////////////////////////////////////////////////";
+		std::cout << "Vous avez choisi la map " << m << std::endl;
+		std::cout << "////////////////////////////////////////////////////////////////////////////////";
+		
+		if(m=="map01"){
+			GlobalConfiguration::setCurrentMap("map01") ;
+			creerChemin("map01");
+		}
+		else{
+			GlobalConfiguration::setCurrentMap("map01") ;
+			creerChemin("map01");
+		}
+	}
+
+	void MainApplication::choixBudget(std::string m,OgreBites::SelectMenu * menu){
+		budget = stoi(m);
+		budget_restant = budget;
+	}
+
+	void MainApplication::choixVal()
+	{
+		m_trayManager->destroyWidget("Mode");
+		m_trayManager->destroyWidget("Map");
+		m_trayManager->destroyWidget("Budget");
+
+		m_trayManager->getWidget("Hippo")->show();
+		m_trayManager->getWidget("Croco")->show();
+		m_trayManager->getWidget("Moustic")->show();
+		m_trayManager->getWidget("Val")->hide();
+
+		if(mode==2)	{
+			maj_caption();
+			b_r->show();
+		}
+
+		else{
+			std::string caption = "Choisissez une unite";
+			arme->setCaption(caption);
+		}
+		arme->show();
+	}
+
+	void MainApplication::choixUnites(OgreBites::Button *b){
+
+		if(mode==2)
+		{
+			if(b->getName() == "Hippo")	{
+				budget_restant -= hippo_c;
+				armee[2]++;
 			}
-			else if(budget_r >= croco_c){
-				std::cout << "Veuillez choisir entre :\n (1) _Moustic ($250).\n (2) _Croco ($500)." << std::endl;
-				std::cin >> choix;
+			else if(b->getName() == "Croco"){
+				budget_restant -= croco_c;
+				armee[1]++;
 			}
-			else{
-				std::cout << "Veuillez choisir entre :\n (1) _Moustic ($250)." << std::endl;
-				std::cin >> choix;
-			}
-			switch(choix){
-				case 1:
-					budget_r -= moustic_c;
-					armee[0]++;
-					break;
-				case 2:
-					budget_r -= croco_c;
-					armee[1]++;
-					break;
-				case 3:
-					budget_r -= hippo_c;
-					armee[2]++;
-					break;
-				default:
-					std::cout << "Mauvais choix :(" << std::endl;
-					break;
+			else {
+				budget_restant -= moustic_c;
+				armee[0]++;
 			}
 		}
+		else{
+			if(b->getName() == "Hippo")	{armee[2]++; armee[5]++;}
+			else if(b->getName() == "Croco"){armee[1]++; armee[4]++;}
+			else {armee[0]++; armee[3]++;}
+		}
 		
-		std::cout << "////////////////////////////////////////////////////////////////////////////////";
-		std::cout << "////////////////////////////////////////////////////////////////////////////////";
-		std::cout << "Votre armee contient : " << armee[2] << " Hippo(s), " << armee[1] << " Croco(s) et " << armee[0] << " Moustic(s) " << std::endl;
-		std::cout << "L' armee IA contient : " << armee[5] << " Hippo(s), " << armee[4] << " Croco(s) et " << armee[3] << " Moustic(s) " << std::endl;
+		maj_caption();
+
+	}
+
+	void MainApplication::maj_caption()
+	{
+		if(mode==2)
+		{
+			std::string caption = "Budget restant = ";
+			caption.append(std::to_string((_ULonglong)budget_restant));
+			b_r->setCaption(caption);
+		
+			std::string caption2("Votre armee contient : \n");
+			caption2.append(std::to_string((_ULonglong)armee[0]));
+			caption2.append(" Moustic(s), ");
+			caption2.append(std::to_string((_ULonglong)armee[1]));
+			caption2.append(" Croco(s) et ");
+			caption2.append(std::to_string((_ULonglong)armee[2]));
+			caption2.append(" Hippo(s).");
+			arme->setCaption(caption2);
+		}
+		if(budget_restant < moustic_c || mode==1)
+		{
+			m_trayManager->getWidget("Val_armee")->show();
+			m_trayManager->getWidget("Annul_armee")->show();
+			m_trayManager->getWidget("Hippo")->hide();
+			m_trayManager->getWidget("Croco")->hide();
+			m_trayManager->getWidget("Moustic")->hide();
+		}
+		else if(budget_restant < croco_c){
+			m_trayManager->getWidget("Hippo")->hide();
+			m_trayManager->getWidget("Croco")->hide();
+		}
+		else if(budget_restant < hippo_c){
+			m_trayManager->getWidget("Hippo")->hide();
+		}
+	}
+
+	void MainApplication::Annul_armee(){
+		budget_restant = budget;
+		armee[0] = 0;
+		armee[1] = 0;
+		armee[2] = 0;
+		armee[3] = 0;
+		armee[4] = 0;
+		armee[5] = 0;
+		maj_caption();
+		m_trayManager->getWidget("Val_armee")->hide();
+		m_trayManager->getWidget("Annul_armee")->hide();
+		m_trayManager->getWidget("Hippo")->show();
+		m_trayManager->getWidget("Croco")->show();
+		m_trayManager->getWidget("Moustic")->show();
+
+	}
+
+	void MainApplication::Val_armee()
+	{
+
 		::std::vector<::std::string> types ;
 		types.push_back("MousticB") ;
 		types.push_back("CrocoB") ;
@@ -203,9 +323,41 @@ namespace OgreFramework
 		types.push_back("MousticR") ;
 		types.push_back("CrocoR") ;
 		types.push_back("HippoR") ;
-		std::cout << "////////////////////////////////////////////////////////////////////////////////";
-		std::cout << "////////////////////////////////////////////////////////////////////////////////" << std::endl;
+
+		int budget_r_ia = budget;
+		if(mode==2)
+		{
+			while(budget_r_ia >= moustic_c){
+		
+					if(budget_r_ia >= croco_c){	
+						budget_r_ia -= croco_c;
+						armee[4]++;
+					}
+
+					if(budget_r_ia >= croco_c){	
+						budget_r_ia -= croco_c;
+						armee[4]++;
+					}
+
+					if(budget_r_ia >= hippo_c){	
+						budget_r_ia -= hippo_c;
+						armee[5]++;
+					}				
+					if(budget_r_ia >= moustic_c){	
+						budget_r_ia -= moustic_c;
+						armee[3]++;
+					}	
+				}
+		}
 		creerArmee(types, armee);
+
+		m_trayManager->getWidget("Val_armee")->hide();
+		m_trayManager->destroyWidget("Annul_armee");
+		m_trayManager->destroyWidget("Hippo");
+		m_trayManager->destroyWidget("Croco");
+		m_trayManager->destroyWidget("Moustic");
+		m_trayManager->destroyWidget("Budget_restant");
+		m_trayManager->destroyWidget("Arme");
 	}
 
 	void MainApplication::creerArmee(::std::vector<::std::string> types, std::vector<int> armee){
@@ -256,12 +408,15 @@ namespace OgreFramework
 			GameElements::IAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ;
 			m_entityAdapter->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(GlobalConfiguration::getCurrentMap()->findFreeLocation()).push(0.0)) ;
 		}
+
+		START = true;
 	}
 
 	void MainApplication::creerChemin(std::string map)
 	{
-		const char * c = &map[map.size() - 1];
 
+		const char * c = &map[map.size() - 1];
+		cibles.clear();
 		switch(atoi(c))
 		{
 		case 1:
@@ -269,16 +424,25 @@ namespace OgreFramework
 			cibles.push_back(Ogre::Vector3(-30,30,75));
 			cibles.push_back(Ogre::Vector3(-15,-20,75));
 			cibles.push_back(Ogre::Vector3(-15,-20,30));
-			cibles.push_back(Ogre::Vector3(-5,-5,30));
-			cibles.push_back(Ogre::Vector3(5,5,50));
-			cibles.push_back(Ogre::Vector3(10,-10,75));
-			cibles.push_back(Ogre::Vector3(10,-10,30));
-			cibles.push_back(Ogre::Vector3(30,-25,30));
+			cibles.push_back(Ogre::Vector3(-15,-5,30));
+			cibles.push_back(Ogre::Vector3(15,-5,30));
+			cibles.push_back(Ogre::Vector3(30,-30,30));
+			cibles.push_back(Ogre::Vector3(30,-30,75));
+			cibles.push_back(Ogre::Vector3(0,0,70));
+			break;
+		case 2:
+			cibles.push_back(Ogre::Vector3(0,0,70));
+			cibles.push_back(Ogre::Vector3(-30,30,75));
+			cibles.push_back(Ogre::Vector3(-15,-20,75));
+			cibles.push_back(Ogre::Vector3(-15,-20,30));
+			cibles.push_back(Ogre::Vector3(-15,-5,30));
+			cibles.push_back(Ogre::Vector3(15,-5,30));
+			cibles.push_back(Ogre::Vector3(30,-30,30));
 			cibles.push_back(Ogre::Vector3(30,-30,75));
 			cibles.push_back(Ogre::Vector3(0,0,70));
 			break;
 		default:
-			FLAG = false;
+			CINE = false;
 			std::cout << "map inexistante" << std::endl;
 			break;
 		}
@@ -286,8 +450,10 @@ namespace OgreFramework
 
 	void MainApplication::update(Ogre::Real dt)
 	{
+
 		// Necessary for GUI...
 		m_trayManager->adjustTrays() ;
+		
 		//dt = ::std::min(dt,0.01f) ;
 		static double time = 0 ;
 		time += dt ;
@@ -322,20 +488,34 @@ namespace OgreFramework
 		// Updates camera manager
 		m_cameraManager->update(dt) ;
 
-		if(FLAG){
-			
+		if(CINE){
 			Ogre::Real dist = cibles[current_cible].squaredDistance(m_camera->getPosition()) ; 
 			
-			if( dist < 250 ) current_cible++; // TO DO !! 
+			if( dist < 50 ) current_cible++; // TO DO !! 
 
-			if(current_cible >= cibles.size()) FLAG = false ;
+			if(current_cible >= cibles.size()) {CINE = false ;DEF_VIEW = true;}
 			else{
 				Ogre::Vector3 v = cibles[current_cible] - m_camera->getPosition();
 				if(m_camera->getPosition()[2] < 50) m_camera->move((v/v.normalise())* 400*dt);
 				else m_camera->move((v/v.normalise())* 800*dt);
 			}
 		}
-		else m_camera->setPosition(Ogre::Vector3(0,0,70));
+		
+		if(DEF_VIEW){
+			std::cout << "DEF_VIEW" << std::endl;
+			m_camera->setPosition(Ogre::Vector3(0,0,70));
+			createW();
+			m_trayManager->getWidget("Mode")->show();
+			m_trayManager->getWidget("Map")->show();
+			m_trayManager->getWidget("Val")->show();
+			DEF_VIEW = false;
+		}
+		if(START)
+		{
+			m_trayManager->destroyWidget("Val");
+			m_trayManager->destroyWidget("Val_armee");
+			START = false;
+		}
 
 
 
@@ -360,7 +540,10 @@ namespace OgreFramework
 
 	bool MainApplication::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 	{
-		FLAG = false;
+		if(CINE){
+			CINE = false;
+			DEF_VIEW = true;
+		}
 		bool result = BaseApplication::mousePressed(arg, id) ;
 		m_picking->update(arg, id) ;
 		return result ;
@@ -368,12 +551,40 @@ namespace OgreFramework
 
 	void MainApplication::itemSelected( OgreBites::SelectMenu* menu )
 	{
-		::std::cout<<"Selection in menu "<<menu->getCaption()<<", item: "<<menu->getSelectedItem()<<::std::endl ;
+		if(menu->getName() == "Mode")
+		{
+			std::string m = menu->getSelectedItem();
+			choixMode(m,menu);
+		}
+		else if(menu->getName() == "Map")
+		{
+			std::string m = menu->getSelectedItem();
+			choixMap(m,menu);
+		}
+		else if(menu->getName() == "Budget")
+		{
+			std::string m = menu->getSelectedItem();
+			choixBudget(m,menu);
+		}
+	}
+
+	void MainApplication::buttonHit( OgreBites::Button* button )
+	{
+		if(button->getName() == "Hippo" || button->getName() == "Croco" || button->getName() == "Moustic")
+		{
+			choixUnites(button);
+		}
+		else if(button->getName() == "Val_armee"){Val_armee();}
+		else if(button->getName() == "Annul_armee"){Annul_armee();}
+		else if(button->getName() == "Val"){choixVal();}
 	}
 
 	bool MainApplication::keyPressed( const OIS::KeyEvent &arg )
 	{
-		FLAG = false;
+		if(CINE){
+			CINE = false;
+			DEF_VIEW = true;
+		}
 		// Keeps the keyboard state up to date
 		m_keyboardState.notifyKeyPressed(arg.key) ;
 		// Sends notification to super class

@@ -16,6 +16,7 @@ namespace GameElements
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	class Bullet : GameObject
 	{
+
 	public:
 		typedef ::boost::intrusive_ptr<Bullet> Pointer ;
 
@@ -69,6 +70,8 @@ namespace GameElements
 		/// \param	range	   	The range of the bullet.
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		Bullet(Ogre::SceneNode * node, int lifePoints, int armorPoints, Math::Vector2<Config::Real> const & origin, Math::Vector2<Config::Real> const & velocity, Config::Real range);
+
+		virtual ~Bullet() ;
 
 		///////////////////////////////////////////////////////////////////////////////////
 		/// \brief Callback method called when a collision is detected

@@ -8,6 +8,8 @@
 		* Gérer la VITESSE
 		* MainApplication::creerArmee : IAgent -> PlayerAgent
 		* Rendre les IA moins pussy
+		* Ajouter une carte => probleme de caméra, même nom dans le mesh -> fait buguer Ogre::DotSceneLoader ligne 134
+		* Dans choixMap -> changer Map01 en Map02
 */
 
 namespace GameElements
@@ -113,7 +115,7 @@ namespace GameElements
 						fire(otherPosition+otherVelocity*timeToTarget) ;
 					}
 				}
-				else{//fuite
+				/*else{//fuite
 					const Map::GroundCellDescription & currentCell = OgreFramework::GlobalConfiguration::getCurrentMap()->getCell(getPosition().projectZ()) ;
 					Math::Vector2<Config::Real> newPosition = getPosition().projectZ()+m_velocity*(1.0-currentCell.m_speedReduction) ;
 		
@@ -127,7 +129,7 @@ namespace GameElements
 					{
 						m_velocity = randomVelocity()/4 ;
 					}
-				}
+				}*/
 			}
 		}
 		m_perception->reset() ;
@@ -378,18 +380,16 @@ namespace GameElements
 				
 				else //Support impossible
 				{
-				  if(this->getLifePoints() < 0.4 * this->getArchetype()->m_life)
-				  {
-					  for(unsigned int cpt=0;cpt<liste_ennemis.size();cpt++)
-					  {
+					for(unsigned int cpt=0;cpt<liste_ennemis.size();cpt++)
+					{
 						if(cpt==0) ind_ennemi = 0;
 						else
 						{
 							ind_ennemi = choose_by_name(liste_ennemis, ind_ennemi, cpt); // On tire en priorité sur Croco puis Moustic puis Hippo
 						}
-					  }
-				  }
+					} 
 				}
+				liste_amis.clear();
 			  }
 			  else if(to_kill.size()==1)
 			  {
@@ -403,10 +403,20 @@ namespace GameElements
 			}
 	  		else
 			{
-				ind_ennemi = -1 ;//FUITE ou HELP FRIENDS
+				for(unsigned int cpt=0;cpt<liste_ennemis.size();cpt++)
+				{
+					if(cpt==0) ind_ennemi = 0;
+					else
+					{
+						ind_ennemi = choose_by_name(liste_ennemis, ind_ennemi, cpt); // On tire en priorité sur Croco puis Moustic puis Hippo
+					}
+				}
+				//ind_ennemi = -1; //choose_by_name(liste_ennemis, ind_ennemi, cpt);//Die like a man
 			}
 	
-		 return ind_ennemi;
+			liste_ennemis.clear();
+		  
+			return ind_ennemi;
 		}
 
 }

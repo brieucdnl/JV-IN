@@ -4,7 +4,7 @@
 
 namespace GameElements
 {
-
+	int BulletBase::s_nbBullets = 0 ;
 
 	void BulletBase::hit( CollisionObject::Pointer object )
 	{
@@ -29,7 +29,14 @@ namespace GameElements
 
 	BulletBase::BulletBase( Ogre::SceneNode * node, int lifePoints, int armorPoints ) : GameObject(node), m_lifePoints(lifePoints), m_armorPoints(armorPoints)
 	{
+		s_nbBullets++ ;
+		::std::cout<<"nb bullets: "<<s_nbBullets ;
+	}
 
+	BulletBase::~BulletBase()
+	{
+		s_nbBullets-- ;
+		::std::cout<<"(destroy) nb bullets: "<<s_nbBullets ;
 	}
 
 	void BulletBase::onCollision( const CollisionMessage & message )

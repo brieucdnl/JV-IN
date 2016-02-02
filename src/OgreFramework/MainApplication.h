@@ -29,9 +29,20 @@ namespace OgreFramework
 		virtual ~MainApplication();
 
 	protected:
-		void choixUnites(const int budget);
+		void createW();
+		void choixUnites(OgreBites::Button *b);
 		void creerArmee(::std::vector<::std::string> types, std::vector<int> armee);
 		void MainApplication::creerChemin(std::string map);
+
+		void MainApplication::choixMode(std::string m,OgreBites::SelectMenu * menu);
+		void MainApplication::choixMap(std::string m,OgreBites::SelectMenu * menu);
+		void MainApplication::choixBudget(std::string m,OgreBites::SelectMenu * menu);
+		void MainApplication::choixVal();
+
+		void MainApplication::maj_caption();
+		void MainApplication::Annul_armee();
+		void MainApplication::Val_armee();
+		void MainApplication::buttonHit( OgreBites::Button* button );
 
 		///////////////////////////////////////////////////////////////////////////////////
 		/// \brief Returns the scene manager
