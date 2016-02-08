@@ -24,6 +24,8 @@ namespace GameElements
 	public:
 		AgentBase(const UnitsArchetypes::Archetype * archetype, const WeaponsArchetypes::Archetype * weaponArchetype, int numAgent, bool computeCollisionMesh=true);
 
+		~AgentBase();
+
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// \fn	virtual void NullAgent::update(const Config::Real & dt);
 		///

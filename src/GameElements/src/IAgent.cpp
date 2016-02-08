@@ -1,15 +1,15 @@
 #include <stdafx.h>
 #include <GameElements/IAgent.h>
 #include <GameElements/BulletBase.h>
+#include <OgreFramework/MainApplication.h>
 
 /*
 	TODO :
 		* Call friends
 		* Gérer la VITESSE
 		* MainApplication::creerArmee : IAgent -> PlayerAgent
-		* Rendre les IA moins pussy
-		* Ajouter une carte => probleme de caméra, même nom dans le mesh -> fait buguer Ogre::DotSceneLoader ligne 134
-		* Dans choixMap -> changer Map01 en Map02
+		* Modifier IA sur la fin de la partie
+		* Quand on a rejoint les potes, on fait quoi
 */
 
 namespace GameElements
@@ -47,6 +47,10 @@ namespace GameElements
 
 	void IAgent::update( const Config::Real & dt )
 	{
+		//Calculer le pourcentage d'allies et d'ennemis restants
+		float nbAmis = OgreFramework::MainApplication::nbR/OgreFramework::MainApplication::nbR_total *100 ;
+		float nbEnnemis = OgreFramework::MainApplication::nbB/OgreFramework::MainApplication::nbB_total *100 ; 
+
 		//nom et equipe de l'AgentBase (equipe = R ou B)
 		std::string my_name = getNameAgent(this);
 		char my_team = my_name[my_name.size() -1];
@@ -93,18 +97,20 @@ namespace GameElements
 					Agent::Pointer ptr0 = boost::dynamic_pointer_cast<Agent>(objects[cpt]) ;
 					char agent_team = getNameAgent(ptr0)[getNameAgent(ptr0).size()-1];
 					bool allie =  (agent_team == my_team) ;
-					if(!allie)
-					{
-						ennemis.push_back(ptr0);
-					}
+					if(!allie && ptr0 != this) ennemis.push_back(ptr0);
+
 				}
 
-				int decision = choix(ennemis);
+				if (ennemis.empty()){ m_perception->reset(); return;}
+
+				int decision = choix(ennemis); //Choisir sur qui tirer
+				
+				std::cout << "nbAmis " << nbAmis <<" nbEnnemis " << nbEnnemis << std::endl;
 				if(decision != -1)
 				{
-					Agent::Pointer ptr = boost::dynamic_pointer_cast<Agent>(objects[decision]) ;
+					Agent::Pointer ptr = boost::dynamic_pointer_cast<Agent>(ennemis[decision]) ;
 				
-					if(ptr!=NULL)
+					if(ptr != NULL && ptr != this )
 					{
 						//si l'AgentBase est un ennemi
 						Math::Vector2<Config::Real> otherPosition = ptr->getPosition().projectZ() ;
@@ -113,25 +119,33 @@ namespace GameElements
 						Config::Real distanceToTarget = (getPosition().projectZ()-otherPosition).norm() ;
 						Config::Real timeToTarget = distanceToTarget/bulletSpeed ;
 						fire(otherPosition+otherVelocity*timeToTarget) ;
+						follow_target(ptr);
 					}
 				}
-				/*else{//fuite
-					const Map::GroundCellDescription & currentCell = OgreFramework::GlobalConfiguration::getCurrentMap()->getCell(getPosition().projectZ()) ;
-					Math::Vector2<Config::Real> newPosition = getPosition().projectZ()+m_velocity*(1.0-currentCell.m_speedReduction) ;
+				else{
+					if(nbAmis >25.0 && nbEnnemis >25.0){ //Si il y a encore beaucoup d'amis et d'ennemis
+						//FUITE
+						const Map::GroundCellDescription & currentCell = OgreFramework::GlobalConfiguration::getCurrentMap()->getCell(getPosition().projectZ()) ;
+						Math::Vector2<Config::Real> newPosition = getPosition().projectZ()+m_velocity*(1.0-currentCell.m_speedReduction) ;
 		
-					// If displacement is valid, the AgentBase moves, otherwise, a new random velocity is computed
-					if(OgreFramework::GlobalConfiguration::getCurrentMap()->isValid(newPosition) && OgreFramework::GlobalConfiguration::getCurrentMap()->getCell(newPosition).m_speedReduction!=1.0)
-					{
-						setOrientation(m_velocity/4) ;
-						setPosition(newPosition.push(0.0)) ;
+						// If displacement is valid, the AgentBase moves, otherwise, a new random velocity is computed
+						if(OgreFramework::GlobalConfiguration::getCurrentMap()->isValid(newPosition) && OgreFramework::GlobalConfiguration::getCurrentMap()->getCell(newPosition).m_speedReduction!=1.0)
+						{
+							setOrientation(m_velocity/4) ;
+							setPosition(newPosition.push(0.0)) ;
+						}
+						else
+						{
+							m_velocity = randomVelocity()/4 ;
+						}
 					}
 					else
 					{
-						m_velocity = randomVelocity()/4 ;
+						if(!(this->getFriends().empty())){follow_target(this->getFriends()[0]);}
 					}
-				}*/
+				}
 			}
-		}
+		}//fin phase de tir
 		m_perception->reset() ;
 	}
 
@@ -157,6 +171,8 @@ namespace GameElements
 		else{return i2;} //Cas Hippo - Moustic
 	  }
 	}
+
+	void IAgent::follow_target(Agent::Pointer a){std::cout << "follow target" << std::endl;} 
 
 	float IAgent::getFrequency(Agent::Pointer a)
 	{
@@ -403,15 +419,15 @@ namespace GameElements
 			}
 	  		else
 			{
-				for(unsigned int cpt=0;cpt<liste_ennemis.size();cpt++)
+				/*for(unsigned int cpt=0;cpt<liste_ennemis.size();cpt++)
 				{
 					if(cpt==0) ind_ennemi = 0;
 					else
 					{
 						ind_ennemi = choose_by_name(liste_ennemis, ind_ennemi, cpt); // On tire en priorité sur Croco puis Moustic puis Hippo
 					}
-				}
-				//ind_ennemi = -1; //choose_by_name(liste_ennemis, ind_ennemi, cpt);//Die like a man
+				}*/
+				ind_ennemi = -1; //choose_by_name(liste_ennemis, ind_ennemi, cpt);//Die like a man
 			}
 	
 			liste_ennemis.clear();

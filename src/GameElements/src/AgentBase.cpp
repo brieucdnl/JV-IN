@@ -1,6 +1,7 @@
 #include <stdafx.h>
 #include <GameElements/AgentBase.h>
 #include <GameElements/BulletBase.h>
+#include <OgreFramework/MainApplication.h>
 
 namespace GameElements
 {	
@@ -30,6 +31,11 @@ namespace GameElements
 		circle->setVisible(false);
 
 		this->m_entity->attachObject(circle);
+	}
+	
+	AgentBase::~AgentBase(){
+		if(getArchetype()->m_name[getArchetype()->m_name.size()-1] == 'R') OgreFramework::MainApplication::nbR--;
+		else  OgreFramework::MainApplication::nbB--;
 	}
 
 	void AgentBase::onCollision( const CollisionMessage & message )

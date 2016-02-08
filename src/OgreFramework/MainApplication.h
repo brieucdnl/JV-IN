@@ -24,9 +24,13 @@ namespace OgreFramework
 	///////////////////////////////////////////////////////////////////////////////////
 	class MainApplication : public BaseApplication
 	{
+
 	public:
 		MainApplication();
 		virtual ~MainApplication();
+		
+		static float nbB_total, nbR_total;
+		static float nbB, nbR;
 
 	protected:
 		void createW();
@@ -42,6 +46,7 @@ namespace OgreFramework
 		void MainApplication::maj_caption();
 		void MainApplication::Annul_armee();
 		void MainApplication::Val_armee();
+		void MainApplication::Quit();
 		void MainApplication::buttonHit( OgreBites::Button* button );
 
 		///////////////////////////////////////////////////////////////////////////////////

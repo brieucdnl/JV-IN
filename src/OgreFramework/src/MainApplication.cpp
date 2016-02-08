@@ -28,6 +28,11 @@ namespace OgreFramework
 {
 	int hippo_c = 1000, croco_c = 500, moustic_c = 250;
 
+	float MainApplication::nbR = 0;
+	float MainApplication::nbB = 0;
+	float MainApplication::nbR_total = 0;
+	float MainApplication::nbB_total = 0;
+
 	OgreBites::Label * b_r ;
 	OgreBites::Label * arme;
 	std::vector<int> armee(6,0);
@@ -35,6 +40,7 @@ namespace OgreFramework
 	bool CINE = true;
 	bool DEF_VIEW = false;
 	bool START = false;
+	bool PLAYING = false;
 
 	// Data parties
 	int budget = 0;
@@ -115,10 +121,10 @@ namespace OgreFramework
 	{
 		{
 			std::string caption = "Budget restant = 0 ";
-			b_r =  m_trayManager->createLabel(OgreBites::TL_CENTER,"Budget_restant",caption,250);
-			arme =  m_trayManager->createLabel(OgreBites::TL_CENTER,"Arme","Votre armee est vide",500);
+			b_r =  m_trayManager->createLabel(OgreBites::TL_CENTER,"Budget_restant",caption,250);	
+			OgreBites::Label * info = m_trayManager->createLabel(OgreBites::TL_CENTER,"Info","Vous etes les bleus ",250);
 			b_r->hide();
-			arme->hide();
+			info->hide();
 			OgreBites::Button * valid_armee =  m_trayManager->createButton(OgreBites::TL_CENTER, "Val_armee", "Valider",100) ;
 			OgreBites::Button * annul_armee =  m_trayManager->createButton(OgreBites::TL_CENTER, "Annul_armee", "Annuler",100) ;
 			valid_armee->hide();
@@ -135,7 +141,7 @@ namespace OgreFramework
 		{
 			Ogre::StringVector tmp ;
 			tmp.push_back("Map 01") ;
-			tmp.push_back("Map 02") ;
+			tmp.push_back("Msap 02") ;
 			OgreBites::SelectMenu * menu2 = m_trayManager->createThickSelectMenu(OgreBites::TL_CENTER, "Map", "Choisissez la Map", 200, 10, tmp) ;	
 			menu2->hide();
 		}
@@ -172,6 +178,10 @@ namespace OgreFramework
 			b_C->hide();
 			b_M->hide();
 		}
+		{
+			arme =  m_trayManager->createLabel(OgreBites::TL_CENTER,"Arme","Votre armee est vide",500);		
+			arme->hide();
+		}
 	}
 	
 	void MainApplication::choixMode(std::string m,OgreBites::SelectMenu * menu){
@@ -197,13 +207,13 @@ namespace OgreFramework
 		std::cout << "Vous avez choisi la map " << m << std::endl;
 		std::cout << "////////////////////////////////////////////////////////////////////////////////";
 		
-		if(m=="map01"){
+		if(m=="Map 01"){
 			GlobalConfiguration::setCurrentMap("map01") ;
 			creerChemin("map01");
 		}
 		else{
-			GlobalConfiguration::setCurrentMap("map01") ;
-			creerChemin("map01");
+			GlobalConfiguration::setCurrentMap("map02") ;
+			creerChemin("map02");
 		}
 	}
 
@@ -222,6 +232,7 @@ namespace OgreFramework
 		m_trayManager->getWidget("Croco")->show();
 		m_trayManager->getWidget("Moustic")->show();
 		m_trayManager->getWidget("Val")->hide();
+		m_trayManager->getWidget("Info")->show();
 
 		if(mode==2)	{
 			maj_caption();
@@ -360,6 +371,9 @@ namespace OgreFramework
 		m_trayManager->destroyWidget("Arme");
 	}
 
+	void MainApplication::Quit()
+	{exit(0);}
+
 	void MainApplication::creerArmee(::std::vector<::std::string> types, std::vector<int> armee){
 		
 		int nbMoustic = armee[0], nbCroco = armee[1], nbHippo = armee[2];
@@ -373,18 +387,22 @@ namespace OgreFramework
 			const GameElements::WeaponsArchetypes::Archetype * weapon = GlobalConfiguration::getConfigurationLoader()->getWeaponsArchetypes().get(unit->m_weapon) ;
 			GameElements::IAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ;//a changer
 			m_entityAdapter->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(GlobalConfiguration::getCurrentMap()->findFreeLocation()).push(0.0)) ;
+			MainApplication::nbB++;
+
 		}
 		for(int cpt=0 ; cpt<nbCroco ; cpt++){
 			const GameElements::UnitsArchetypes::Archetype * unit = GlobalConfiguration::getConfigurationLoader()->getUnitsArchetypes().get(types[1]) ;
 			const GameElements::WeaponsArchetypes::Archetype * weapon = GlobalConfiguration::getConfigurationLoader()->getWeaponsArchetypes().get(unit->m_weapon) ;
 			GameElements::IAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ;//a changer
 			m_entityAdapter->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(GlobalConfiguration::getCurrentMap()->findFreeLocation()).push(0.0)) ;
+			MainApplication::nbB++;
 		}
 		for(int cpt=0 ; cpt<nbHippo ; cpt++){
 			const GameElements::UnitsArchetypes::Archetype * unit = GlobalConfiguration::getConfigurationLoader()->getUnitsArchetypes().get(types[2]) ;
 			const GameElements::WeaponsArchetypes::Archetype * weapon = GlobalConfiguration::getConfigurationLoader()->getWeaponsArchetypes().get(unit->m_weapon) ;
 			GameElements::IAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ; //a changer
 			m_entityAdapter->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(GlobalConfiguration::getCurrentMap()->findFreeLocation()).push(0.0)) ;
+			MainApplication::nbB++;
 		}
 
 		/*
@@ -395,20 +413,25 @@ namespace OgreFramework
 			const GameElements::WeaponsArchetypes::Archetype * weapon = GlobalConfiguration::getConfigurationLoader()->getWeaponsArchetypes().get(unit->m_weapon) ;
 			GameElements::IAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ;
 			m_entityAdapter->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(GlobalConfiguration::getCurrentMap()->findFreeLocation()).push(0.0)) ;
+			MainApplication::nbR++;
 		}
 		for(int cpt=0 ; cpt<nbCrocoIA ; cpt++){
 			const GameElements::UnitsArchetypes::Archetype * unit = GlobalConfiguration::getConfigurationLoader()->getUnitsArchetypes().get(types[4]) ;
 			const GameElements::WeaponsArchetypes::Archetype * weapon = GlobalConfiguration::getConfigurationLoader()->getWeaponsArchetypes().get(unit->m_weapon) ;
 			GameElements::IAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ;
 			m_entityAdapter->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(GlobalConfiguration::getCurrentMap()->findFreeLocation()).push(0.0)) ;
+			MainApplication::nbR++;
 		}
 		for(int cpt=0 ; cpt<nbHippoIA ; cpt++){
 			const GameElements::UnitsArchetypes::Archetype * unit = GlobalConfiguration::getConfigurationLoader()->getUnitsArchetypes().get(types[5]) ;
 			const GameElements::WeaponsArchetypes::Archetype * weapon = GlobalConfiguration::getConfigurationLoader()->getWeaponsArchetypes().get(unit->m_weapon) ;
 			GameElements::IAgent::Pointer m_entityAdapter = new GameElements::IAgent(unit, weapon, cpt) ;
 			m_entityAdapter->setPosition(GlobalConfiguration::getCurrentMap()->toWorldCoordinates(GlobalConfiguration::getCurrentMap()->findFreeLocation()).push(0.0)) ;
+			MainApplication::nbR++;
 		}
-
+		
+		MainApplication::nbB_total = MainApplication::nbB;
+		MainApplication::nbR_total = MainApplication::nbR;
 		START = true;
 	}
 
@@ -502,7 +525,7 @@ namespace OgreFramework
 		}
 		
 		if(DEF_VIEW){
-			std::cout << "DEF_VIEW" << std::endl;
+			//std::cout << "DEF_VIEW" << std::endl;
 			m_camera->setPosition(Ogre::Vector3(0,0,70));
 			createW();
 			m_trayManager->getWidget("Mode")->show();
@@ -514,10 +537,10 @@ namespace OgreFramework
 		{
 			m_trayManager->destroyWidget("Val");
 			m_trayManager->destroyWidget("Val_armee");
+			m_trayManager->destroyWidget("Info");
 			START = false;
+			PLAYING = true;
 		}
-
-
 
 		// Updates (animation, behavoir & son on) are called here :)
 		GlobalConfiguration::getController()->update(dt) ;
@@ -536,6 +559,19 @@ namespace OgreFramework
 		//	// attach the particle system to a scene node
 		//	getRootSceneNode()->attachObject(particleSystem);
 		//}
+
+
+
+		if(PLAYING && ( (MainApplication::nbB == 0) || (MainApplication::nbR == 0))){
+			std::string caption =" ";
+			if(MainApplication::nbR == 0) {caption = "You win !" ;}
+			else {caption = "You lose :(";}
+			m_trayManager->createLabel(OgreBites::TL_CENTER,"Win",caption,250);
+			m_trayManager->createButton(OgreBites::TL_CENTER, "Quit", "Quit",100) ;
+			PLAYING = false;
+		}
+		 
+
 	}
 
 	bool MainApplication::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
@@ -577,6 +613,7 @@ namespace OgreFramework
 		else if(button->getName() == "Val_armee"){Val_armee();}
 		else if(button->getName() == "Annul_armee"){Annul_armee();}
 		else if(button->getName() == "Val"){choixVal();}
+		else if(button->getName() == "Quit"){Quit();}
 	}
 
 	bool MainApplication::keyPressed( const OIS::KeyEvent &arg )
