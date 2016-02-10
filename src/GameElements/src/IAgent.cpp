@@ -6,12 +6,9 @@
 /*
 	TODO :
 		* Call friends
-		* Gérer la VITESSE
+		* Gestion des obstacles dans le Dijkstra
 		* MainApplication::creerArmee : IAgent -> PlayerAgent
-		* Modifier IA sur la fin de la partie
-		* Quand on a rejoint les potes, on fait quoi
 */
-
 namespace GameElements
 {
 	// Get name

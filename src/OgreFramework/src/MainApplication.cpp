@@ -20,6 +20,7 @@
 #include <GameElements/RandomAgent.h>
 #include <GameElements/IAgent.h>
 #include <sstream>
+#include <OgreFramework/Dijkstra.h>
 
 #define SSTR( x ) static_cast< std::ostringstream & >( \
     ( std::ostringstream() << std::dec << x ) ).str()
@@ -115,6 +116,26 @@ namespace OgreFramework
 
 		// Setups the camera control system
 		m_cameraManager = new RTSCameraManager(m_sceneManager, m_camera, &m_keyboardState) ;
+
+		
+		//TEST de DIJKSTRA
+		/*Math::Vector2<Config::Real> my_position(0,0);
+		Math::Vector2<Config::Real> target_position(10,15);
+		std::vector<Math::Vector2<Config::Real>> chemin;
+		if(GlobalConfiguration::getCurrentMap()->isValid(target_position))
+		{
+			calc_chemin(GlobalConfiguration::getCurrentMap(),my_position,target_position,chemin);
+		}
+		else{std::cout << "position non valide" <<std::endl;}
+		std::cout << "/////////////////////////////////////////////////////////////////" << std::endl;
+		std::cout << "Chemin : " << std::endl;
+		for(int i=0;i<chemin.size();i++)
+		{
+			std::cout << chemin[i]  << std::endl;
+		}
+		std::cout << "/////////////////////////////////////////////////////////////////" << std::endl;*/
+
+
 	}
 
 	void MainApplication::createW()

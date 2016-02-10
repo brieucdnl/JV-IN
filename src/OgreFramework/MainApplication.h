@@ -11,6 +11,7 @@
 #include <OgreFramework/RTSCameraManager.h>
 #include <OgreFramework/EntityAdapter.h>
 #include <GameElements/NullAgent.h>
+#include <Math/Vector2.h>
 
 namespace OgreFramework
 {

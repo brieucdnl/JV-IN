@@ -301,6 +301,9 @@
     <ClInclude Include="..\src\GameElements\AgentJoueur.h">
       <Filter>GameElements</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\OgreFramework\Dijkstra.h">
+      <Filter>OgreFramework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\System\src\ActiveObject.cpp">
@@ -449,6 +452,9 @@
     </ClCompile>
     <ClCompile Include="..\src\GameElements\src\AgentJoueur.cpp">
       <Filter>GameElements\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\OgreFramework\src\Dijkstra.cpp">
+      <Filter>OgreFramework\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
