@@ -11,7 +11,6 @@ namespace GameElements
 	{
 		m_velocity = randomVelocity() ;
 
-
 		m_numAgent = numAgent;
 		circle = OgreFramework::GlobalConfiguration::getSceneManager()->createManualObject(this->getArchetype()->m_name+"num"+(char)m_numAgent);
 		circle->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_STRIP);
@@ -30,6 +29,7 @@ namespace GameElements
 		circle->end();
 		circle->setVisible(false);
 
+		this->m_entity->showBoundingBox(false);
 		this->m_entity->attachObject(circle);
 	}
 	
@@ -40,13 +40,39 @@ namespace GameElements
 
 	void AgentBase::onCollision( const CollisionMessage & message )
 	{
-
+		
 	}
 
 	Math::Vector2<Config::Real> AgentBase::getVelocity() const
 	{
 		const Map::GroundCellDescription & currentCell = OgreFramework::GlobalConfiguration::getCurrentMap()->getCell(getPosition().projectZ()) ;
 		return m_velocity*(1.0-currentCell.m_speedReduction) ;
+	}
+
+	Math::Vector2<Config::Real> AgentBase::randomVelocity() const
+	{
+		Math::Vector2<Config::Real> velocity(rand()-RAND_MAX/2, rand()-RAND_MAX/2) ;
+		velocity = velocity.normalized() * m_archetype->m_speed ;
+		return velocity ;
+	}
+
+	Math::Vector2<Config::Real> AgentBase::computeVelocity(Math::Vector3<Config::Real> position) const
+	{
+		const Map::GroundCellDescription & currentCell = OgreFramework::GlobalConfiguration::getCurrentMap()->getCell(getPosition().projectZ()) ;
+		Math::Vector2<Config::Real> velocity(position.x()-getPosition().x(), position.y()-getPosition().y());
+		velocity = velocity.normalized() * m_archetype->m_speed;
+		return velocity;
+	}
+
+	void AgentBase::goToPosition(const Math::Vector3<Config::Real> position)
+	{
+		m_velocity = computeVelocity(position);
+		setOrientation(m_velocity);
+	}
+
+	void AgentBase::followTarget(Agent& agent)
+	{
+		goToPosition(agent.getPosition(  ));
 	}
 
 	void AgentBase::agentSelection() const
@@ -61,5 +87,13 @@ namespace GameElements
 		//std::cout << "Unselected item : " << this->getArchetype()->m_name+"num"+(char)m_numAgent << std::endl;
 	}
 
+	void AgentBase::setTargetPosition(Math::Vector3<Config::Real> pos)
+	{
+		m_targetPos = pos;
+	}
 
+	Math::Vector3<Config::Real> AgentBase::getTargetPosition() const
+	{
+		return m_targetPos;
+	}
 }
